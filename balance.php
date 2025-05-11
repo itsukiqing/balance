@@ -2,7 +2,7 @@
 
 $SUPABASE_URL = 'https://jospczygelbmnzwqepdp.supabase.co';
 $SUPABASE_API_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Impvc3BjenlnZWxibW56d3FlcGRwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDM3NjA5ODIsImV4cCI6MjA1OTMzNjk4Mn0.HZmcO7xXxIYdWGpvbu-13qSu0s3dkUXzSMvGN3eCpfE';
-$table = 'balances';
+$table = 'balance';
 
 $unit = $_GET['unit'] ?? '';
 $unit = trim($unit);
