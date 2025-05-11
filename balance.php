@@ -1,26 +1,36 @@
 <?php
-$balances = [
-    '101' => 850,
-    '102' => 0,
-    '103' => 1000,
-    '114' => 114514,
-    '201' => 100,
-    '202' => 120,
-    '203' => 1200,
-    '301' => 200,
-    '302' => 500,
-    '303' => 280,
-    '401' => 200,
-    '402' => 500,
-    '403' => 280,
-    '501' => 800,
-    '502' => 1000,
-    '503' => 1500,
-];
 
+$SUPABASE_URL = 'https://jospczygelbmnzwqepdp.supabase.co';
+$SUPABASE_API_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Impvc3BjenlnZWxibW56d3FlcGRwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDM3NjA5ODIsImV4cCI6MjA1OTMzNjk4Mn0.HZmcO7xXxIYdWGpvbu-13qSu0s3dkUXzSMvGN3eCpfE';
+$table = 'balances';
 
 $unit = $_GET['unit'] ?? '';
 $unit = trim($unit);
+$balance = null;
+$error = null;
+
+if ($unit !== '') {
+    $url = "$SUPABASE_URL/rest/v1/$table?unit_number=eq." . urlencode($unit) . "&select=balance";
+
+    $ch = curl_init($url);
+    curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+    curl_setopt($ch, CURLOPT_HTTPHEADER, [
+        "apikey: $SUPABASE_API_KEY",
+        "Authorization: Bearer $SUPABASE_API_KEY",
+        "Content-Type: application/json"
+    ]);
+
+    $response = curl_exec($ch);
+    curl_close($ch);
+
+    $data = json_decode($response, true);
+
+    if (isset($data[0]['balance'])) {
+        $balance = $data[0]['balance'];
+    } else {
+        $error = "❌ Unit $unit not found in database.";
+    }
+}
 ?>
 
 <!DOCTYPE html>
@@ -38,15 +48,14 @@ $unit = trim($unit);
 
     <hr/>
 
-    <?php
-    if ($unit !== '') {
-        if (array_key_exists($unit, $balances)) {
-            $balance = $balances[$unit];
-            echo "<p>Outstanding Balance for Unit $unit: <strong>\$$balance</strong></p>";
-        } else {
-            echo "<p style='color:red;'>❌ Unit $unit not found.</p>";
-        }
-    }
-    ?>
+    <?php if ($unit !== ''): ?>
+        <?php if ($balance !== null): ?>
+            <p>Outstanding Balance for Unit <strong><?= htmlspecialchars($unit) ?></strong>: 
+                <strong>$<?= $balance ?></strong>
+            </p>
+        <?php else: ?>
+            <p style="color:red;"><?= $error ?></p>
+        <?php endif; ?>
+    <?php endif; ?>
 </body>
 </html>
